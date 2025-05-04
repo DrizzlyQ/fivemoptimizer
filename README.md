@@ -1,7 +1,7 @@
 
 # 🧹 Drizzly PC Optimizer
 
-![Drizzly PC Optimizer Banner](https://mir-s3-cdn-cf.behance.net/project_modules/fs/9bc27292880429.5e569ff84e4d0.gif)
+![Drizzly PC Optimizer Banner](https://i.imgur.com/CE2Pqsv.png)
 
 > ⚡ Boost your PC performance with style.  
 > Designed for gamers, streamers, and performance freaks. Built with Electron.
