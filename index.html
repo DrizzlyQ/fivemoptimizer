@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drizzly PC Optimizer</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://mir-s3-cdn-cf.behance.net/project_modules/fs/9bc27292880429.5e569ff84e4d0.gif') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+    .overlay {
+      background: rgba(0, 0, 0, 0.7);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: cyan;
+    }
+    .detected {
+      margin-bottom: 30px;
+      font-size: 1rem;
+      color: lightgray;
+    }
+    .controls {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 0.9rem;
+    }
+    .controls label {
+      color: cyan;
+      margin-right: 10px;
+    }
+    .grid {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 1400px;
+    }
+    .column {
+      flex: 1;
+      min-width: 280px;
+      max-width: 400px;
+    }
+    .column h2 {
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 1.2rem;
+      color: #90caf9;
+    }
+    .category {
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+    }
+    .category:hover {
+      transform: scale(1.02);
+      background: rgba(255, 255, 255, 0.09);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    }
+    .category:not(.done) {
+      animation: glow 2s infinite ease-in-out;
+    }
+    @keyframes glow {
+      0%   { box-shadow: 0 0 8px rgba(0,255,255,0.1); }
+      50%  { box-shadow: 0 0 12px rgba(0,255,255,0.3); }
+      100% { box-shadow: 0 0 8px rgba(0,255,255,0.1); }
+    }
+    .category.done {
+      background: rgba(0, 128, 0, 0.3);
+    }
+    button {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(0, 188, 212, 0.9);
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    button:hover {
+      background: rgba(0, 160, 190, 1);
+      transform: scale(1.05);
+    }
+    .done-msg {
+      margin-left: 10px;
+      color: #90ee90;
+      font-weight: bold;
+      display: none;
+    }
+    .category.done .done-msg {
+      display: inline;
+    }
+    .footer {
+      margin-top: 60px;
+      font-size: 0.9rem;
+      color: #90caf9;
+    }
+  
+.scanning-header {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: cyan;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulseText 2s ease-in-out infinite;
+}
+.scanning-header .icon {
+  display: inline-block;
+  margin-left: 10px;
+  animation: floatScan 2s ease-in-out infinite;
+  font-size: 1.8rem;
+}
+@keyframes floatScan {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(12px); }
+  100% { transform: translateX(0); }
+}
+@keyframes pulseText {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+
+.scan-message {
+  font-size: 1.6rem;
+  color: #90ee90;
+  margin-bottom: 20px;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+.scan-message.show {
+  opacity: 1;
+}
+.scanning-header {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: cyan;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulseText 2s ease-in-out infinite;
+}
+.scanning-header .icon {
+  display: inline-block;
+  margin-left: 10px;
+  animation: floatScan 2s ease-in-out infinite;
+  font-size: 1.8rem;
+}
+@keyframes pulseText {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+</style>
+
+</head>
+<body>
+  <div class="overlay">
+    
+<h1 class="scanning-header" id="scanHeader">
+  Scanning your system <span class="icon">🔍</span>
+</h1>
+<div class="scan-message" id="scanDoneMsg">✔ Scan Complete!</div>
+
+    <div class="detected">Detected: 3 Issues in System | 2 in Performance | 1 in Gaming</div>
+    <div class="controls">
+      <label>[Animated Background:]</label>
+      <button>Sound</button>
+    </div>
+    <div class="grid">
+      <div class="column">
+        <h2>System</h2>
+        <div class="category" id="tempFiles"><span>🧹 Temp Files</span><button>Fix</button></div>
+        <div class="category" id="prefetch"><span>⚡ Prefetch</span><button>Fix</button></div>
+        <div class="category" id="windowsLogs"><span>📜 Windows Logs</span><button>Fix</button></div>
+        <div class="category" id="crashDumps"><span>💥 Crash Dumps</span><button>Fix</button></div>
+        <div class="category" id="softwareDist"><span>📦 SoftwareDist</span><button>Fix</button></div>
+      </div>
+      <div class="column">
+        <h2>Performance</h2>
+        <div class="category" id="sysMain"><span>⚙️ SysMain</span><button>Fix</button></div>
+        <div class="category" id="diagPolicy"><span>🩺 DiagPolicy</span><button>Fix</button></div>
+        <div class="category" id="diagTracking"><span>📈 DiagTracking</span><button>Fix</button></div>
+        <div class="category" id="performancePlan"><span>🚀 Perf Plan</span><button>Fix</button></div>
+        <div class="category" id="gpuScheduling"><span>📊 GPU Sched</span><button>Fix</button></div>
+      </div>
+      <div class="column">
+        <h2>Gaming</h2>
+        <div class="category" id="gameBar"><span>🎮 Game Bar</span><button>Fix</button></div>
+        <div class="category" id="xboxServices"><span>📡 Xbox Services</span><button>Fix</button></div>
+        <div class="category" id="xboxGameMonitoring"><span>🎮 Game Monitoring</span><button>Fix</button></div>
+        <div class="category" id="backgroundApps"><span>🔋 Background Apps</span><button>Fix</button></div>
+        <div class="category" id="edgeOneDrive"><span>📥 Edge/OneDrive</span><button>Fix</button></div>
+      </div>
+    </div>
+    <div class="footer">💠 Made with love by Drizzly</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    function markDone(id) {
+      const el = document.getElementById(id);
+      el.classList.add('done');
+      const soundEnabled = true;
+      if (soundEnabled) {
+        const audio = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_b4e8ed2215.mp3");
+        audio.play();
+      }
+      confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+      autoDetect();
+    }
+
+    async function fixAll() {
+      const fixOrder = Array.from(document.querySelectorAll('.category button:not(:disabled)'));
+      for (const btn of fixOrder) {
+        btn.click();
+        await new Promise(r => setTimeout(r, 300));
+      }
+      await autoDetect();
+    }
+
+    async function autoDetect() {
+      let system = 0, performance = 0, gaming = 0;
+
+      const setStatus = (id, status, group) => {
+        const btn = document.querySelector(`#${id} button`);
+        if (!btn) return;
+        if (status) {
+          btn.innerText = '✅ Optimized';
+          btn.disabled = true;
+        } else {
+          btn.innerText = 'Fix';
+          btn.disabled = false;
+          if (group === 'system') system++;
+          else if (group === 'performance') performance++;
+          else if (group === 'gaming') gaming++;
+        }
+      };
+
+      const tempMB = await ipcRenderer.invoke('get-temp-size');
+      const tempClean = parseFloat(tempMB) <= 20;
+      const tempBtn = document.querySelector('#tempFiles button');
+      tempBtn.innerText = tempClean ? '✅ Clean' : `Fix (${tempMB} MB)`;
+      tempBtn.disabled = tempClean;
+      if (!tempClean) system++;
+
+      const sysmainStatus = await ipcRenderer.invoke('check-sysmain');
+      setStatus('sysMain', sysmainStatus !== 'running', 'performance');
+
+      const registryChecks = [
+        { id: 'gameBar', key: 'AppCaptureEnabled', path: 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR', expected: '0x0', group: 'gaming' },
+        { id: 'gpuScheduling', key: 'HwSchMode', path: 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers', expected: '0x2', group: 'performance' },
+        { id: 'backgroundApps', key: 'GlobalUserDisabled', path: 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications', expected: '0x1', group: 'gaming' }
+      ];
+
+      for (const check of registryChecks) {
+        const ok = await ipcRenderer.invoke('detect-reg-value', {
+          path: check.path,
+          name: check.key,
+          expected: check.expected
+        });
+        setStatus(check.id, ok, check.group);
+      }
+
+      const perfPlan = await ipcRenderer.invoke('detect-power-plan');
+      setStatus('performancePlan', perfPlan, 'performance');
+
+      const summary = document.querySelector('.detected');
+      summary.textContent = `Detected: ${system} Issues in System | ${performance} in Performance | ${gaming} in Gaming`;
+    }
+
+    window.onload = () => {
+      autoDetect();
+
+      const cleanupMappings = {
+        tempFiles: async () => await ipcRenderer.invoke('clean-temp-files'),
+        prefetch: async () => await ipcRenderer.invoke('clean-folder', 'prefetch'),
+        windowsLogs: async () => await ipcRenderer.invoke('clean-folder', 'windowsLogs'),
+        crashDumps: async () => await ipcRenderer.invoke('clean-folder', 'crashDumps'),
+        softwareDist: async () => await ipcRenderer.invoke('clean-folder', 'softwareDist'),
+      };
+
+      for (const id in cleanupMappings) {
+        const el = document.querySelector(`#${id} button`);
+        if (el) {
+          el.onclick = async () => {
+            await cleanupMappings[id]();
+            markDone(id);
+          };
+        }
+      }
+
+      const serviceMappings = {
+        sysMain: 'sysMain',
+        xboxGameMonitoring: 'xboxGameMonitoring',
+        diagTracking: 'diagTracking',
+        diagPolicy: 'diagPolicy'
+      };
+
+      for (const id in serviceMappings) {
+        const el = document.querySelector(`#${id} button`);
+        if (el) {
+          el.onclick = async () => {
+            await ipcRenderer.invoke('toggle-service', id);
+            markDone(id);
+          };
+        }
+      }
+
+      const regTweaks = {
+        gameBar: 'gameBar',
+        gpuScheduling: 'gpuScheduling',
+        backgroundApps: 'backgroundApps',
+        edgeOneDrive: 'edgeOneDrive'
+      };
+
+      for (const id in regTweaks) {
+        const el = document.querySelector(`#${id} button`);
+        if (el) {
+          el.onclick = async () => {
+            await ipcRenderer.invoke('run-registry-optimization', id);
+            markDone(id);
+          };
+        }
+      }
+
+      const otherOptimizations = {
+        performancePlan: async () => await ipcRenderer.invoke('enable-performance-plan'),
+        xboxServices: async () => await ipcRenderer.invoke('stop-xbox-services')
+      };
+
+      for (const id in otherOptimizations) {
+        const el = document.querySelector(`#${id} button`);
+        if (el) {
+          el.onclick = async () => {
+            await otherOptimizations[id]();
+            markDone(id);
+          };
+        }
+      }
+    };
+  </script>
+  </body>
+</html>
+
+</html>
